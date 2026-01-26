@@ -1,41 +1,81 @@
 ## 👋 Welcome to headscale 🚀
 
-Headscale - Tailscale control server
+Open-source, self-hosted Tailscale control server
 
 ## 📋 Description
 
-Tailscale control server
+Open-source, self-hosted Tailscale control server
 
 ## 🚀 Services
 
-- **app**: Headscale (`headscale/headscale:latest`)
+- **app**: headscale/headscale:latest
 
 ## 📦 Installation
 
-```shell
+### Option 1: Quick Install
+```bash
+curl -q -LSsf "https://raw.githubusercontent.com/composemgr/headscale/main/docker-compose.yaml" -o compose.yml
+```
+
+### Option 2: Git Clone
+```bash
+git clone "https://github.com/composemgr/headscale" ~/.local/srv/docker/headscale
+cd ~/.local/srv/docker/headscale
+docker compose up -d
+```
+
+### Option 3: Using composemgr
+```bash
 composemgr install headscale
 ```
 
 ## 🔧 Configuration
 
+### Environment Variables
+
 ```shell
 TZ=America/New_York
-BASE_HOST_NAME=headscale.example.com
 ```
+
+See `docker-compose.yaml` for complete list of configurable options.
 
 ## 🌐 Access
 
-- **Headscale**: http://localhost:8080
+- **Web Interface**: http://172.17.0.1:8080
 
 ## 📂 Volumes
 
-- `./rootfs/data/headscale` - Application data
+- `./rootfs/data/headscale` - Data storage
 
-## 🔐 Security
+## 🔍 Logging
 
-- Change default passwords
-- Configure HTTPS with reverse proxy
-- Regular backups
+```shell
+docker compose logs -f app
+```
+
+## 🛠️ Management
+
+```bash
+# Start services
+docker compose up -d
+
+# Stop services
+docker compose down
+
+# Update to latest images
+docker compose pull && docker compose up -d
+
+# View logs
+docker compose logs -f
+
+# Restart services
+docker compose restart
+```
+
+## 📋 Requirements
+
+- Docker Engine 20.10+
+- Docker Compose V2+
 
 ## 🤝 Author
 
