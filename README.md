@@ -45,7 +45,7 @@ See `docker-compose.yaml` for complete list of configurable options.
 
 ## 📂 Volumes
 
-- `./rootfs/data/headscale` - Data storage
+- `./volumes/data/headscale` - Data storage
 
 ## 🔍 Logging
 
