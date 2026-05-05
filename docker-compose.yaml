@@ -20,7 +20,7 @@ services:
     ports:
       - '172.17.0.1:8080:8080'
     volumes:
-      - './rootfs/data/headscale:/data'
+      - './volumes/data/headscale:/data'
     networks:
       - headscale
 
