@@ -1,4 +1,4 @@
-# nginx proxy address - http://172.17.0.1:8080
+# nginx proxy address - http://172.17.0.1:8085
 
 name: headscale
 x-logging: &default-logging
@@ -15,12 +15,28 @@ services:
     restart: always
     pull_policy: always
     logging: *default-logging
+    command: serve
     environment:
       TZ: ${TZ:-America/New_York}
     ports:
-      - '172.17.0.1:8080:8080'
+      - '172.17.0.1:8085:8080'
+      - '172.17.0.1:9090:9090'
     volumes:
-      - './volumes/data/headscale:/data'
+      - './volumes/config/headscale:/etc/headscale'
+      - './volumes/data/headscale:/var/lib/headscale'
+    networks:
+      - headscale
+
+  headscale-ui:
+    image: ghcr.io/gurucomputing/headscale-ui:latest
+    container_name: headscale-ui
+    restart: always
+    pull_policy: always
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-America/New_York}
+    ports:
+      - '172.17.0.1:8086:80'
     networks:
       - headscale
 
