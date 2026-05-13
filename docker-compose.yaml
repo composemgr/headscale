@@ -18,6 +18,8 @@ services:
     command: serve
     environment:
       TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: headscale-app
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     ports:
       - '172.17.0.1:8085:8080'
       - '172.17.0.1:9090:9090'
@@ -26,6 +28,24 @@ services:
       - './volumes/data/headscale:/var/lib/headscale'
     networks:
       - headscale
+      - proxy
+      - cloudflare
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://headscale-app:8080'
+      - 'cloudflare.hostname=headscale.${CLOUDFLARE_ZONE_NAME:-}'
+      - 'traefik.http.routers.headscale-app.entrypoints=http'
+      - 'traefik.http.routers.headscale-app-secure.tls=true'
+      - 'traefik.http.routers.headscale-app.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.headscale-app-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.headscale-app.middlewares=headscale-app-https-redirect'
+      - 'traefik.http.routers.headscale-app-secure.entrypoints=https'
+      - 'traefik.http.routers.headscale-app-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.headscale-app-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.headscale-app-secure.service=headscale-app'
+      - 'traefik.http.services.headscale-app.loadbalancer.server.port=8080'
 
   headscale-ui:
     image: ghcr.io/gurucomputing/headscale-ui:latest
@@ -35,12 +55,36 @@ services:
     logging: *default-logging
     environment:
       TZ: ${TZ:-America/New_York}
+      CONTAINER_NAME: headscale-ui
+      HOSTNAME: ${BASE_HOST_NAME:-$HOSTNAME}
     ports:
       - '172.17.0.1:8086:80'
     networks:
       - headscale
+      - proxy
+      - cloudflare
+    labels:
+      - 'traefik.enable=true'
+      - 'cloudflare.enable=true'
+      - 'traefik.docker.network=proxy'
+      - 'cloudflare.service=http://headscale-ui:80'
+      - 'cloudflare.hostname=headscale.${CLOUDFLARE_ZONE_NAME:-}'
+      - 'traefik.http.routers.headscale-ui.entrypoints=http'
+      - 'traefik.http.routers.headscale-ui-secure.tls=true'
+      - 'traefik.http.routers.headscale-ui.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.middlewares.headscale-ui-https-redirect.redirectscheme.scheme=https'
+      - 'traefik.http.routers.headscale-ui.middlewares=headscale-ui-https-redirect'
+      - 'traefik.http.routers.headscale-ui-secure.entrypoints=https'
+      - 'traefik.http.routers.headscale-ui-secure.rule=Host($(${BASE_HOST_NAME:-$HOSTNAME}))'
+      - 'traefik.http.routers.headscale-ui-secure.tls.certresolver=cloudflare'
+      - 'traefik.http.routers.headscale-ui-secure.service=headscale-ui'
+      - 'traefik.http.services.headscale-ui.loadbalancer.server.port=80'
 
 networks:
   headscale:
     name: headscale
     external: false
+  proxy:
+    external: true
+  cloudflare:
+    external: true
